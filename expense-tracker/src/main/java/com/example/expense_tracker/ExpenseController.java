@@ -29,6 +29,17 @@ public class ExpenseController {
         return expenseService.getExpenseByCategory(category);
     }
 
+
+    @RequestMapping("/expenses/total")
+    public Float getTotalAmount(){
+        return expenseService.getTotalAmount();
+    }
+
+    @RequestMapping("/expenses/total/category")
+    public Float getTotalAmountByCategory(@RequestParam String category){
+        return expenseService.getTotolAmountByCategory(category);
+    }
+
     //Post
     @RequestMapping(method = RequestMethod.POST, value = "/expenses")
     public void addExpense(@RequestBody Expense expense){

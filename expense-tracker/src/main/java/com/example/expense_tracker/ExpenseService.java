@@ -29,6 +29,14 @@ public class ExpenseService {
         return expenses;
     }
 
+    public Float getTotalAmount(){
+        return expenseRepository.getTotal();
+    }
+
+    public Float getTotolAmountByCategory(String category){
+        return expenseRepository.getCategoryTotal(category);
+    }
+
     public void addExpense(Expense expense){
         expenseRepository.save(expense);
     }
