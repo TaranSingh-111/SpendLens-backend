@@ -1,5 +1,7 @@
-package com.example.expense_tracker;
+package com.example.expense_tracker.controller;
 
+import com.example.expense_tracker.model.Expense;
+import com.example.expense_tracker.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

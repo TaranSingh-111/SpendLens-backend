@@ -1,5 +1,6 @@
-package com.example.expense_tracker;
+package com.example.expense_tracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,15 +15,21 @@ public class Expense {
     private Float amount;
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
+
     public Expense() {
     }
 
-    public Expense(Integer id, String expense_date, String category, Float amount, String description) {
+    public Expense(Integer id, String expense_date, String category, Float amount, String description, User user) {
         this.id = id;
         this.expense_date = expense_date;
         this.category = category;
         this.amount = amount;
         this.description = description;
+        this.user = user;
     }
 
     public Integer getId() {
@@ -63,5 +70,13 @@ public class Expense {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

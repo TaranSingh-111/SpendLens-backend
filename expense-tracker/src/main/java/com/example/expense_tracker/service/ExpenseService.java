@@ -1,5 +1,7 @@
-package com.example.expense_tracker;
+package com.example.expense_tracker.service;
 
+import com.example.expense_tracker.model.Expense;
+import com.example.expense_tracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

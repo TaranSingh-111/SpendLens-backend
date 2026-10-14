@@ -1,5 +1,6 @@
-package com.example.expense_tracker;
+package com.example.expense_tracker.repository;
 
+import com.example.expense_tracker.model.Expense;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
