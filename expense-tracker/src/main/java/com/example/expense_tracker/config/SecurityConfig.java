@@ -3,6 +3,7 @@ package com.example.expense_tracker.config;
 import com.example.expense_tracker.repository.UserRepository;
 import com.example.expense_tracker.service.MyUserDetailsService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -13,16 +14,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-@EnableWebSecurity
+@Configuration
 public class SecurityConfig{
 
    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider)
            throws Exception{
        http
                .csrf(csrf -> csrf.disable())
+               .authenticationProvider(authenticationProvider)
                .authorizeHttpRequests(auth -> auth
-                       .requestMatchers("/users", "/auth/**").permitAll()
+                       .requestMatchers("/auth/**").permitAll()
                        .anyRequest().authenticated()
                )
                .httpBasic(Customizer.withDefaults());
