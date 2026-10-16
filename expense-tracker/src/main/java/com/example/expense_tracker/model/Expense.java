@@ -2,6 +2,13 @@ package com.example.expense_tracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jdk.jfr.Category;
+import org.springframework.security.core.parameters.P;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "expenses")
@@ -10,9 +17,17 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String expense_date;
+
+    @NotNull(message = "Date is required")
+    private LocalDate expense_date;
+
+    @NotBlank(message = "Category is required")
     private String category;
+
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be greater than 0")
     private Float amount;
+
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,7 +38,7 @@ public class Expense {
     public Expense() {
     }
 
-    public Expense(Integer id, String expense_date, String category, Float amount, String description, User user) {
+    public Expense(Integer id, LocalDate expense_date, String category, Float amount, String description, User user) {
         this.id = id;
         this.expense_date = expense_date;
         this.category = category;
@@ -40,11 +55,11 @@ public class Expense {
         this.id = id;
     }
 
-    public String getExpense_date() {
+    public LocalDate getExpense_date() {
         return expense_date;
     }
 
-    public void setExpense_date(String expense_date) {
+    public void setExpense_date(LocalDate expense_date) {
         this.expense_date = expense_date;
     }
 
