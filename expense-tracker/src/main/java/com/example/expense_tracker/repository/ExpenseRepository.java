@@ -6,14 +6,24 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ExpenseRepository extends CrudRepository<Expense, Integer> {
 
     public List<Expense> findByCategory(String category);
 
-    @Query("SELECT SUM(e.amount) FROM Expense e")
-    Float getTotal();
+    public List<Expense> findByUserId(Integer userId);
 
-    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.category = :category")
-    Float getCategoryTotal(@Param("category") String category);
+    Optional<Expense> findByIdAndUserId(Integer id, Integer userId);
+
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId")
+    Float getTotalByUserId(@Param("userId") Integer userId);
+
+    @Query("SELECT SUM(e.amount) " +
+            "FROM Expense e " +
+            "WHERE e.user.id = :userId AND e.category = :category")
+    Float getCategoryTotalByUserId(
+            @Param("userId") Integer userId,
+            @Param("category") String category
+    );
 }

@@ -1,7 +1,9 @@
 package com.example.expense_tracker.service;
 
 import com.example.expense_tracker.model.Expense;
+import com.example.expense_tracker.model.User;
 import com.example.expense_tracker.repository.ExpenseRepository;
+import com.example.expense_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,42 +15,77 @@ public class ExpenseService {
 
     @Autowired
     private ExpenseRepository expenseRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public List<Expense> getAllExpenses(){
-        ArrayList<Expense> expenses = new ArrayList<>();
-        expenseRepository.findAll().forEach(expenses::add);
-        return expenses;
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public Expense getExpense(int id){
-        return expenseRepository.findById(id)
+    private Expense getExpenseByIdAndUser(int id, Integer userId){
+        return expenseRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new RuntimeException("Expense Not Found"));
     }
 
-    public List<Expense> getExpenseByCategory(String category){
-        ArrayList<Expense> expenses = new ArrayList<>();
-        expenseRepository.findByCategory(category).forEach(expenses::add);
-        return expenses;
+
+    public List<Expense> getAllExpenses(String email){
+        User user = getUserByEmail(email);
+
+        return expenseRepository.findByUserId(user.getId());
     }
 
-    public Float getTotalAmount(){
-        return expenseRepository.getTotal();
+    public Expense getExpense(int id, String email){
+        User user = getUserByEmail(email);
+
+        return getExpenseByIdAndUser(id, user.getId());
     }
 
-    public Float getTotolAmountByCategory(String category){
-        return expenseRepository.getCategoryTotal(category);
+    public List<Expense> getExpenseByCategory(String category, String email){
+        User user = getUserByEmail(email);
+
+        return expenseRepository.findByUserId(user.getId())
+                .stream()
+                .filter(expense -> category.equals(expense.getCategory()))
+                .toList();
     }
 
-    public void addExpense(Expense expense){
-        expenseRepository.save(expense);
+    public Float getTotalAmount(String email){
+        User user = getUserByEmail(email);
+        Float total = expenseRepository.getTotalByUserId(user.getId());
+
+        return total != null ? total : 0.0f;
     }
 
-    public void updateExpense(int id, Expense expense){
-        expense.setId(id);
-        expenseRepository.save(expense);
+    public Float getTotalAmountByCategory(String email, String category){
+        User user = getUserByEmail(email);
+        Float total = expenseRepository.getCategoryTotalByUserId(user.getId(), category);
+
+        return total != null ? total : 0.0f;
+    }
+//changes till here
+    public Expense addExpense(Expense expense, String email){
+        User user = getUserByEmail(email);
+        expense.setId(null);
+        expense.setUser(user);
+        return expenseRepository.save(expense);
     }
 
-    public void deleteExpense(int id){
-        expenseRepository.deleteById(id);
+    public void updateExpense(int id, Expense expense, String email){
+        User user = getUserByEmail(email);
+        Expense existingExpense = getExpenseByIdAndUser(id, user.getId());
+
+        existingExpense.setExpense_date(expense.getExpense_date());
+        existingExpense.setCategory(expense.getCategory());
+        existingExpense.setAmount(expense.getAmount());
+        existingExpense.setDescription(expense.getDescription());
+
+        expenseRepository.save(existingExpense);
+    }
+
+    public void deleteExpense(int id, String email){
+        User user = getUserByEmail(email);
+        Expense expense = getExpenseByIdAndUser(id, user.getId());
+        expenseRepository.delete(expense);
     }
 }

@@ -3,6 +3,9 @@ package com.example.expense_tracker.controller;
 import com.example.expense_tracker.model.Expense;
 import com.example.expense_tracker.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,50 +17,53 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     //GET ALL
-    @RequestMapping("/expenses")
-    public List<Expense> getExpenses(){
-        return expenseService.getAllExpenses();
+    @GetMapping("/expenses")
+    public List<Expense> getExpenses(Authentication authentication){
+        return expenseService.getAllExpenses(authentication.getName());
     }
 
     //GET BY ID
-    @RequestMapping("/expenses/{id}")
-    public Expense getExpense(@PathVariable int id){
-        return expenseService.getExpense(id);
+    @GetMapping("/expenses/{id}")
+    public Expense getExpense(@PathVariable int id, Authentication authentication){
+        return expenseService.getExpense(id, authentication.getName());
     }
 
     //GET BY CATEGORY
-    @RequestMapping("/expenses/category")
-    public List<Expense> getExpenseByCategory(@RequestParam String category){
-        return expenseService.getExpenseByCategory(category);
+    @GetMapping("/expenses/category")
+    public List<Expense> getExpenseByCategory(@RequestParam String category, Authentication authentication){
+        return expenseService.getExpenseByCategory(category, authentication.getName());
     }
 
 
-    @RequestMapping("/expenses/total")
-    public Float getTotalAmount(){
-        return expenseService.getTotalAmount();
+    @GetMapping("/expenses/total")
+    public Float getTotalAmount(Authentication authentication){
+        return expenseService.getTotalAmount(authentication.getName());
     }
 
-    @RequestMapping("/expenses/total/category")
-    public Float getTotalAmountByCategory(@RequestParam String category){
-        return expenseService.getTotolAmountByCategory(category);
+    @GetMapping("/expenses/total/category")
+    public Float getTotalAmountByCategory(@RequestParam String category, Authentication authentication){
+        return expenseService.getTotalAmountByCategory(category, authentication.getName());
     }
 
     //Post
-    @RequestMapping(method = RequestMethod.POST, value = "/expenses")
-    public void addExpense(@RequestBody Expense expense){
-        System.out.println("Reached Controller");
-        expenseService.addExpense(expense);
+    @PostMapping("/expenses")
+    public ResponseEntity<Expense> addExpense(@RequestBody Expense expense, Authentication authentication){
+        Expense savedExpense = expenseService.addExpense(expense, authentication.getName());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedExpense);
     }
 
     //PUT
-    @RequestMapping(method = RequestMethod.PUT, value = "/expenses/{id}")
-    public void update(@PathVariable int id, @RequestBody Expense expense){
-        expenseService.updateExpense(id, expense);
+    @PutMapping("/expenses/{id}")
+    public void update(@PathVariable int id, @RequestBody Expense expense, Authentication authentication){
+        expenseService.updateExpense(id, expense, authentication.getName());
     }
 
     //DELETE
-    @RequestMapping(method = RequestMethod.DELETE, value = "/expenses/{id}")
-    public  void delete(@PathVariable int id){
-        expenseService.deleteExpense(id);
+    @DeleteMapping("/expenses/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id, Authentication authentication){
+        expenseService.deleteExpense(id, authentication.getName());
+
+        return ResponseEntity.noContent().build();
     }
 }
