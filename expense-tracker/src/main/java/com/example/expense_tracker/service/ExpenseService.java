@@ -1,5 +1,6 @@
 package com.example.expense_tracker.service;
 
+import com.example.expense_tracker.exception.ResourceNotFoundException;
 import com.example.expense_tracker.model.Expense;
 import com.example.expense_tracker.model.User;
 import com.example.expense_tracker.repository.ExpenseRepository;
@@ -20,12 +21,12 @@ public class ExpenseService {
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     private Expense getExpenseByIdAndUser(int id, Integer userId){
         return expenseRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new RuntimeException("Expense Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Expense Not Found"));
     }
 
 
