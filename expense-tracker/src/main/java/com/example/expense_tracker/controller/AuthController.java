@@ -30,7 +30,14 @@ public class AuthController {
                 )
         );
 
-        String token = jwtService.generateToken(authentication.getName());
-        return new LoginResponse(token, "Bearer");
+        String email = authentication.getName();
+
+        String accessToken = jwtService.generateAccessToken(email);
+        String refreshToken = jwtService.generateRefreshToken(email);
+        return new LoginResponse(
+                accessToken,
+                refreshToken,
+                "Bearer",
+                900);
     }
 }

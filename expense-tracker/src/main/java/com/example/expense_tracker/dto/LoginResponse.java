@@ -1,4 +1,9 @@
 package com.example.expense_tracker.dto;
 
-public record LoginResponse(String token, String tokenType) {
+public record LoginResponse(
+        String accessToken,
+        String refreshToken,
+        String tokenType,
+        long expiresIn
+) {
 }
