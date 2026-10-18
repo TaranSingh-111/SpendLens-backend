@@ -2,6 +2,10 @@ package com.example.expense_tracker.controller;
 
 import com.example.expense_tracker.dto.LoginRequest;
 import com.example.expense_tracker.dto.LoginResponse;
+import com.example.expense_tracker.dto.UserResponse;
+import com.example.expense_tracker.exception.ResourceNotFoundException;
+import com.example.expense_tracker.model.User;
+import com.example.expense_tracker.repository.UserRepository;
 import com.example.expense_tracker.service.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,10 +18,12 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/login")
@@ -31,6 +37,13 @@ public class AuthController {
         );
 
         String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
 
         String accessToken = jwtService.generateAccessToken(email);
         String refreshToken = jwtService.generateRefreshToken(email);
@@ -38,6 +51,8 @@ public class AuthController {
                 accessToken,
                 refreshToken,
                 "Bearer",
-                900);
+                900,
+                userResponse
+        );
     }
 }
