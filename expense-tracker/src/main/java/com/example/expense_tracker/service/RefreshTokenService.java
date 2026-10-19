@@ -78,7 +78,7 @@ public class RefreshTokenService {
         }
         String tokenHash = tokenHashService.hash(token);
 
-        RefreshToken storedToken = refreshTokenRepository.findByTokenHash(tokenHash)
+        RefreshToken storedToken = refreshTokenRepository.findByTokenHashForUpdate(tokenHash)
                 .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
 
         if(storedToken.isRevoked()){
