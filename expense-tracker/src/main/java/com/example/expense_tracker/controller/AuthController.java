@@ -5,8 +5,10 @@ import com.example.expense_tracker.dto.LoginResponse;
 import com.example.expense_tracker.dto.UserResponse;
 import com.example.expense_tracker.exception.ResourceNotFoundException;
 import com.example.expense_tracker.model.User;
+import com.example.expense_tracker.repository.RefreshTokenRepository;
 import com.example.expense_tracker.repository.UserRepository;
 import com.example.expense_tracker.service.JwtService;
+import com.example.expense_tracker.service.RefreshTokenService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,11 +20,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository) {
+    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, RefreshTokenService refreshTokenService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
         this.userRepository = userRepository;
     }
 
@@ -37,6 +41,10 @@ public class AuthController {
         );
 
         String email = authentication.getName();
+
+        String accessToken = jwtService.generateAccessToken(email);
+        String refreshToken = refreshTokenService.createRefreshToken(email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         UserResponse userResponse = new UserResponse(
@@ -45,8 +53,6 @@ public class AuthController {
                 user.getEmail()
         );
 
-        String accessToken = jwtService.generateAccessToken(email);
-        String refreshToken = jwtService.generateRefreshToken(email);
         return new LoginResponse(
                 accessToken,
                 refreshToken,

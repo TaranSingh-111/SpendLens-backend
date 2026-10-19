@@ -76,9 +76,13 @@ public class JwtService {
     }
 
     public boolean isRefreshToken(String token){
-        return "refresh".equals(
-                extractClaims(token).get("token_type", String.class)
-        );
+        try {
+            return "refresh".equals(
+                    extractClaims(token).get("token_type", String.class)
+            );
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     //matches the username with the userDetails provided
