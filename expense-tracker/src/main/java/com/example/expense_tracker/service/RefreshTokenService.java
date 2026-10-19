@@ -1,5 +1,6 @@
 package com.example.expense_tracker.service;
 
+import com.example.expense_tracker.exception.InvalidRefreshTokenException;
 import com.example.expense_tracker.exception.ResourceNotFoundException;
 import com.example.expense_tracker.model.RefreshToken;
 import com.example.expense_tracker.model.User;
@@ -8,8 +9,6 @@ import com.example.expense_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.sql.Ref;
 import java.time.Instant;
 
 @Service
@@ -68,19 +67,25 @@ public class RefreshTokenService {
 
     @Transactional(readOnly = true)
     public RefreshToken validateRefreshToken(String token){
+        if (token == null || token.isBlank()) {
+            throw new InvalidRefreshTokenException(
+                    "Refresh token is required"
+            );
+        }
+
         if(!jwtService.isRefreshToken(token)){
-            throw new IllegalArgumentException("Invalid refresh token");
+            throw new InvalidRefreshTokenException("Invalid refresh token");
         }
         String tokenHash = tokenHashService.hash(token);
 
         RefreshToken storedToken = refreshTokenRepository.findByTokenHash(tokenHash)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
 
         if(storedToken.isRevoked()){
-            throw new IllegalArgumentException("Refresh token revoked");
+            throw new InvalidRefreshTokenException("Refresh token revoked");
         }
         if(!storedToken.getExpiresAt().isAfter(Instant.now())){
-            throw new IllegalArgumentException("Refresh token expired");
+            throw new InvalidRefreshTokenException("Refresh token expired");
         }
 
         return storedToken;
@@ -88,6 +93,16 @@ public class RefreshTokenService {
 
     @Transactional
     public void revokeRefreshToken(String token){
+        if (token == null || token.isBlank()) {
+            throw new InvalidRefreshTokenException(
+                    "Refresh token is required"
+            );
+        }
+
+        if(!jwtService.isRefreshToken(token)){
+            throw new InvalidRefreshTokenException("Invalid refresh token");
+        }
+
         String tokenHash = tokenHashService.hash(token);
 
         refreshTokenRepository.findByTokenHash(tokenHash)
