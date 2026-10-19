@@ -34,6 +34,20 @@ public class RefreshTokenService {
     }
 
     @Transactional
+    public String rotateRefreshToken(String token){
+        //verifying the token
+        RefreshToken storedToken = validateRefreshToken(token);
+
+        //revoking the old token
+        storedToken.setRevoked(true);
+        refreshTokenRepository.saveAndFlush(storedToken);
+
+        //creating the new token
+        String email = storedToken.getUser().getEmail();
+        return createRefreshToken(email);
+    }
+
+    @Transactional
     public String createRefreshToken(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

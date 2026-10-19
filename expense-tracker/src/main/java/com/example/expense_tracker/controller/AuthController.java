@@ -2,6 +2,7 @@ package com.example.expense_tracker.controller;
 
 import com.example.expense_tracker.dto.LoginRequest;
 import com.example.expense_tracker.dto.LoginResponse;
+import com.example.expense_tracker.dto.RefreshTokenRequest;
 import com.example.expense_tracker.dto.UserResponse;
 import com.example.expense_tracker.exception.ResourceNotFoundException;
 import com.example.expense_tracker.model.User;
@@ -56,6 +57,34 @@ public class AuthController {
         return new LoginResponse(
                 accessToken,
                 refreshToken,
+                "Bearer",
+                900,
+                userResponse
+        );
+    }
+
+    @PostMapping("/refresh")
+    public LoginResponse refresh(@RequestBody RefreshTokenRequest request){
+        String oldRefreshToken = request.refreshToken();
+
+        //validate the token and generate replacement
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(oldRefreshToken);
+
+        //creating new access token
+        String email = jwtService.extractUsername(oldRefreshToken);
+        String newAccessToken = jwtService.generateAccessToken(email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+
+        return new LoginResponse(
+                newAccessToken,
+                newRefreshToken,
                 "Bearer",
                 900,
                 userResponse
