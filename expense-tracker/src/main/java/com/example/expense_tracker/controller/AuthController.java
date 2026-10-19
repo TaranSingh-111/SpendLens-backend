@@ -1,15 +1,13 @@
 package com.example.expense_tracker.controller;
 
-import com.example.expense_tracker.dto.LoginRequest;
-import com.example.expense_tracker.dto.LoginResponse;
-import com.example.expense_tracker.dto.RefreshTokenRequest;
-import com.example.expense_tracker.dto.UserResponse;
+import com.example.expense_tracker.dto.*;
 import com.example.expense_tracker.exception.ResourceNotFoundException;
 import com.example.expense_tracker.model.User;
 import com.example.expense_tracker.repository.RefreshTokenRepository;
 import com.example.expense_tracker.repository.UserRepository;
 import com.example.expense_tracker.service.JwtService;
 import com.example.expense_tracker.service.RefreshTokenService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -89,5 +87,12 @@ public class AuthController {
                 900,
                 userResponse
         );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequest request){
+        refreshTokenService.revokeRefreshToken(request.refreshToken());
+
+        return ResponseEntity.noContent().build();
     }
 }
