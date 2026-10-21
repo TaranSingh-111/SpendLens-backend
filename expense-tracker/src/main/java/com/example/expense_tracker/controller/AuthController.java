@@ -7,11 +7,15 @@ import com.example.expense_tracker.repository.RefreshTokenRepository;
 import com.example.expense_tracker.repository.UserRepository;
 import com.example.expense_tracker.service.JwtService;
 import com.example.expense_tracker.service.RefreshTokenService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -31,6 +35,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request){
+        System.out.println("Login controller reached");
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -94,5 +99,11 @@ public class AuthController {
         refreshTokenService.revokeRefreshToken(request.refreshToken());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Invalid email or password"));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.expense_tracker.service;
 
+import com.example.expense_tracker.exception.UserAlreadyExistsException;
 import com.example.expense_tracker.model.User;
 import com.example.expense_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,11 @@ public class UserService {
     }
 
     public void addUser(User user){
+        if(userRepository.findByEmail(user.getEmail()).isPresent()){
+            throw new UserAlreadyExistsException(
+                    "An account with this email already exists"
+            );
+        }
         user.setId(null);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
