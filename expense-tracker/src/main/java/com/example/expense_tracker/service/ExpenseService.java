@@ -72,7 +72,7 @@ public class ExpenseService {
         return expenseRepository.save(expense);
     }
 
-    public void updateExpense(int id, Expense expense, String email){
+    public Expense updateExpense(int id, Expense expense, String email){
         User user = getUserByEmail(email);
         Expense existingExpense = getExpenseByIdAndUser(id, user.getId());
 
@@ -81,7 +81,7 @@ public class ExpenseService {
         existingExpense.setAmount(expense.getAmount());
         existingExpense.setDescription(expense.getDescription());
 
-        expenseRepository.save(existingExpense);
+        return expenseRepository.save(existingExpense);
     }
 
     public void deleteExpense(int id, String email){

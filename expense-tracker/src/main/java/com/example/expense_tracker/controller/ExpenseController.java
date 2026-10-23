@@ -56,8 +56,10 @@ public class ExpenseController {
 
     //PUT
     @PutMapping("/expenses/{id}")
-    public void update(@PathVariable int id, @Valid @RequestBody Expense expense, Authentication authentication){
-        expenseService.updateExpense(id, expense, authentication.getName());
+    public ResponseEntity<Expense> update(@PathVariable int id, @Valid @RequestBody Expense expense, Authentication authentication){
+        Expense updatedExpense = expenseService.updateExpense(id, expense, authentication.getName());
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedExpense);
     }
 
     //DELETE
