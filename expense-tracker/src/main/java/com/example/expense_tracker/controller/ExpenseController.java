@@ -29,6 +29,12 @@ public class ExpenseController {
         return expenseService.getExpense(id, authentication.getName());
     }
 
+    //GET CATEGORIES
+    @GetMapping("/categories")
+    public List<String> getCategories(Authentication authentication){
+        return expenseService.getDistinctCategories(authentication.getName());
+    }
+
     //GET BY CATEGORY
     @GetMapping("/expenses/category")
     public List<Expense> getExpenseByCategory(@RequestParam String category, Authentication authentication){

@@ -26,4 +26,15 @@ public interface ExpenseRepository extends CrudRepository<Expense, Integer> {
             @Param("userId") Integer userId,
             @Param("category") String category
     );
+
+
+    @Query("""
+            SELECT DISTINCT e.category
+            FROM Expense e
+            WHERE e.user.id = :userId
+            ORDER BY e.category
+            """)
+    List<String> findDistinctCategoriesByUserId(
+            @Param("userId") Integer userId
+    );
 }

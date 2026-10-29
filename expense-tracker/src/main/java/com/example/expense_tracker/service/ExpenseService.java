@@ -19,6 +19,7 @@ public class ExpenseService {
     @Autowired
     private UserRepository userRepository;
 
+    //helpers
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -30,6 +31,7 @@ public class ExpenseService {
     }
 
 
+    //fetch
     public List<Expense> getAllExpenses(String email){
         User user = getUserByEmail(email);
 
@@ -40,6 +42,12 @@ public class ExpenseService {
         User user = getUserByEmail(email);
 
         return getExpenseByIdAndUser(id, user.getId());
+    }
+
+    public List<String> getDistinctCategories(String email){
+        User user = getUserByEmail(email);
+
+        return expenseRepository.findDistinctCategoriesByUserId(user.getId());
     }
 
     public List<Expense> getExpenseByCategory(String category, String email){
@@ -64,7 +72,9 @@ public class ExpenseService {
 
         return total != null ? total : 0.0f;
     }
-//changes till here
+
+
+    //operations
     public Expense addExpense(Expense expense, String email){
         User user = getUserByEmail(email);
         expense.setId(null);
