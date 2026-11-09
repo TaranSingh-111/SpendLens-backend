@@ -8,8 +8,11 @@ import com.example.expense_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ExpenseService {
@@ -66,11 +69,30 @@ public class ExpenseService {
         return total != null ? total : 0.0f;
     }
 
-    public Float getTotalAmountByCategory(String email, String category){
+    public Float getTotalAmountByCategory(String email, String category, LocalDate startDate, LocalDate endDate){
         User user = getUserByEmail(email);
-        Float total = expenseRepository.getCategoryTotalByUserId(user.getId(), category);
+        Float total = expenseRepository.getCategoryTotalByUserId(user.getId(), category, startDate, endDate);
 
         return total != null ? total : 0.0f;
+    }
+
+    public Map<String, Double> getCategoryTotals(String email, LocalDate startDate, LocalDate endDate) {
+        User user = getUserByEmail(email);
+        List<Object[]> results = expenseRepository.getCategoryTotalsByUserId(
+                user.getId(),
+                startDate,
+                endDate
+        );
+
+        Map<String, Double> totals = new HashMap<>();
+
+        for(Object[] result : results){
+            String category = (String) result[0];
+            Double amount = ((Number) result[1]).doubleValue();
+
+            totals.put(category, amount);
+        }
+        return totals;
     }
 
 

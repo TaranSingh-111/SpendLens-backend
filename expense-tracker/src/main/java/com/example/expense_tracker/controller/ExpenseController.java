@@ -4,12 +4,15 @@ import com.example.expense_tracker.model.Expense;
 import com.example.expense_tracker.service.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ExpenseController {
@@ -48,8 +51,29 @@ public class ExpenseController {
     }
 
     @GetMapping("/expenses/total/category")
-    public Float getTotalAmountByCategory(@RequestParam String category, Authentication authentication){
-        return expenseService.getTotalAmountByCategory(category, authentication.getName());
+    public Float getTotalAmountByCategory(
+            @RequestParam String category,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+            Authentication authentication
+    ){
+        return expenseService.getTotalAmountByCategory(authentication.getName(), category, startDate, endDate);
+    }
+
+
+    @GetMapping("expenses/total/category/all")
+    public ResponseEntity<Map<String, Double>> getCategoryTotals(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+            Authentication authentication
+    ) {
+        Map<String, Double> totals = expenseService.getCategoryTotals(authentication.getName(), startDate, endDate);
+
+        return ResponseEntity.ok(totals);
     }
 
     //Post
