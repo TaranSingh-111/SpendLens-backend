@@ -16,6 +16,17 @@ public interface ExpenseRepository extends CrudRepository<Expense, Integer> {
 
     public List<Expense> findByUserId(Integer userId);
 
+    @Query("""
+    SELECT e FROM Expense e
+    WHERE e.user.id = :userId
+    AND e.expense_date BETWEEN :startDate AND :endDate
+""")
+    List<Expense> findByUserAndDateRange(
+            Integer userId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
     Optional<Expense> findByIdAndUserId(Integer id, Integer userId);
 
     @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId")

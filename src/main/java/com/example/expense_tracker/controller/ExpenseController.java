@@ -22,8 +22,11 @@ public class ExpenseController {
 
     //GET ALL
     @GetMapping("/expenses")
-    public List<Expense> getExpenses(Authentication authentication){
-        return expenseService.getAllExpenses(authentication.getName());
+    public List<Expense> getExpenses(
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            Authentication authentication){
+        return expenseService.getAllExpenses(authentication.getName(),startDate, endDate);
     }
 
     //GET BY ID

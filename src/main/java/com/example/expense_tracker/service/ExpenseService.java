@@ -35,10 +35,14 @@ public class ExpenseService {
 
 
     //fetch
-    public List<Expense> getAllExpenses(String email){
+    public List<Expense> getAllExpenses(String email, LocalDate startDate, LocalDate endDate){
         User user = getUserByEmail(email);
 
-        return expenseRepository.findByUserId(user.getId());
+        return expenseRepository.findByUserAndDateRange(
+                user.getId(),
+                startDate,
+                endDate
+        );
     }
 
     public Expense getExpense(int id, String email){
