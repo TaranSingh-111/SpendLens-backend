@@ -19,7 +19,8 @@ public interface ExpenseRepository extends CrudRepository<Expense, Integer> {
     @Query("""
     SELECT e FROM Expense e
     WHERE e.user.id = :userId
-    AND e.expense_date BETWEEN :startDate AND :endDate
+    AND e.expense_date >= :startDate
+    AND e.expense_date < :endDate
 """)
     List<Expense> findByUserAndDateRange(
             Integer userId,
