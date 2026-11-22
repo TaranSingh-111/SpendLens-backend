@@ -37,7 +37,7 @@ public interface AnalyticsRepository extends JpaRepository<Expense, Integer> {
             WHERE e.user.id = :userId
             AND e.expense_date >= :startDate
             AND e.expense_date < :endDate
-            GROUP BY e.expense_date,
+            GROUP BY e.expense_date
             ORDER BY e.expense_date
             """)
     List<Object[]> getSpendingTrends(

@@ -21,6 +21,7 @@ public interface ExpenseRepository extends CrudRepository<Expense, Integer> {
     WHERE e.user.id = :userId
     AND e.expense_date >= :startDate
     AND e.expense_date < :endDate
+    ORDER BY e.id
 """)
     List<Expense> findByUserAndDateRange(
             Integer userId,
