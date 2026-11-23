@@ -4,9 +4,8 @@ import com.example.expense_tracker.model.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
+import org.springframework.data.domain.Pageable;
 
-import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public interface AnalyticsRepository extends JpaRepository<Expense, Integer> {
             AND e.expense_date >= :startDate
             AND e.expense_date < :endDate
             """)
-    Object[] getSpendingSummary(
+    List<Object[]> getSpendingSummary(
             @Param("userId") Integer userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
@@ -48,7 +47,7 @@ public interface AnalyticsRepository extends JpaRepository<Expense, Integer> {
 
     //category and amount
     @Query("""
-            SELECT 
+            SELECT
                 e.category,
                 SUM(e.amount)
             FROM Expense e
