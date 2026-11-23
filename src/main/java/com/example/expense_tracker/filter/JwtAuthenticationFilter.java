@@ -2,6 +2,7 @@ package com.example.expense_tracker.filter;
 
 import com.example.expense_tracker.service.JwtService;
 import com.example.expense_tracker.service.MyUserDetailsService;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -69,6 +70,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
+        }catch (ExpiredJwtException e) {
+            System.out.println("JWT EXPIRED - RETURNING 401");
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            System.out.println("STATUS BEFORE RETURN: " + response.getStatus());
+            return;
+
         }catch (JwtException | IllegalArgumentException | UsernameNotFoundException e){
             //tells spring to not authenticate
             SecurityContextHolder.clearContext();
